@@ -12,13 +12,17 @@
 [![Shell](https://img.shields.io/badge/made%20with-Bash-4EAA25.svg)](https://www.gnu.org/software/bash/)
 [![zenity](https://img.shields.io/badge/GUI-zenity-orange.svg)](https://wiki.gnome.org/Projects/Zenity)
 
+<img src="docs/icono-128.png" alt="Limpiador Mint" width="96">
+
 </div>
 
-<!-- 📸 CAPTURAS: coloca tus imágenes en docs/img/ y descomenta estas líneas:
-| ![Menú principal](docs/img/menu.png) | ![Limpiar basura](docs/img/limpiar.png) |
+## 📸 Capturas / Screenshots
+
+| Menú principal | Limpiar basura |
 |:---:|:---:|
+| ![Menú principal](docs/img/menu.png) | ![Limpiar basura](docs/img/limpiar.png) |
+| **Borrar aplicaciones** | **Espacio en disco** |
 | ![Borrar apps](docs/img/apps.png) | ![Espacio en disco](docs/img/espacio.png) |
--->
 
 ---
 

@@ -47,7 +47,13 @@ crear_atajo() {
   if ! confirmar "¿Crear un acceso directo «Limpiador Mint» en tu menú de aplicaciones?"; then
     return 0
   fi
-  mkdir -p "$HOME/.local/share/applications"
+  mkdir -p "$HOME/.local/share/applications" "$HOME/.local/share/icons"
+  # Instalamos el icono propio en la carpeta de iconos del usuario
+  local icono="preferences-system"
+  if [[ -f "$DIR_BASE/docs/icono.png" ]]; then
+    cp "$DIR_BASE/docs/icono.png" "$HOME/.local/share/icons/limpiador-mint.png"
+    icono="limpiador-mint"
+  fi
   cat > "$destino" <<EOF
 [Desktop Entry]
 Type=Application
@@ -56,7 +62,7 @@ Name=Limpiador Mint
 GenericName=Limpiador del sistema
 Comment=Limpia basura del sistema y desinstala aplicaciones
 Exec=bash ${DIR_BASE}/limpiador.sh
-Icon=preferences-system
+Icon=${icono}
 Terminal=false
 Categories=System;Utility;
 StartupNotify=true
