@@ -1,86 +1,167 @@
+<div align="center">
+
 # 🧹 Limpiador Mint
 
-Herramienta gráfica para **Linux Mint** que automatiza la limpieza de basura
-del sistema y la desinstalación de aplicaciones (APT y Flatpak), usando
-ventanas de [zenity](https://help.gnome.org/users/zenity/stable/) y `pkexec`
-para pedir permisos de administrador con el diálogo nativo del sistema.
+**Limpia la basura del sistema y desinstala aplicaciones en Linux Mint con una interfaz gráfica simple. Sin memorizar comandos.**
 
-## Requisitos
+*A graphical cleaner for Linux Mint — clean system junk and uninstall apps easily. No commands to remember.*
 
-- Linux Mint (probado en Mint 22.3 XFCE)
-- `zenity` (ya viene instalado en Mint)
-- `pkexec` (polkit, ya viene instalado en Mint)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](../../releases)
+[![Platform](https://img.shields.io/badge/platform-Linux%20Mint-87CF3E.svg)](https://linuxmint.com)
+[![Shell](https://img.shields.io/badge/made%20with-Bash-4EAA25.svg)](https://www.gnu.org/software/bash/)
+[![zenity](https://img.shields.io/badge/GUI-zenity-orange.svg)](https://wiki.gnome.org/Projects/Zenity)
 
-## Uso
+</div>
+
+<!-- 📸 CAPTURAS: coloca tus imágenes en docs/img/ y descomenta estas líneas:
+| ![Menú principal](docs/img/menu.png) | ![Limpiar basura](docs/img/limpiar.png) |
+|:---:|:---:|
+| ![Borrar apps](docs/img/apps.png) | ![Espacio en disco](docs/img/espacio.png) |
+-->
+
+---
+
+## 🇪🇸 Español
+
+### ¿Qué hace?
+
+Limpiador Mint automatiza todos esos comandos de mantenimiento que siempre tienes que buscar en internet (`apt autoremove`, `journalctl --vacuum-time`, `flatpak uninstall --unused`...) y los convierte en una ventana gráfica con casillas de verificación, tamaños estimados y confirmaciones.
+
+### Funciones
+
+| Categoría | Qué limpia |
+|---|---|
+| 🗃️ Caché de APT | Paquetes `.deb` descargados (`apt clean` + `autoclean`) |
+| 📦 Paquetes huérfanos | Dependencias que ya nadie usa (`apt autoremove --purge`) |
+| 🐧 Kernels antiguos | Kernels viejos — **conserva siempre el actual y el más nuevo** |
+| 📱 Flatpaks sin usar | Runtimes huérfanos y cachés de Flatpak |
+| 🖼️ Miniaturas | Caché de miniaturas de imágenes (`~/.cache/thumbnails`) |
+| ⏱️ Temporales | Archivos de `/tmp` con más de 1 día |
+| 🗑️ Papelera | Vacía la papelera de reciclaje |
+| 📜 Logs del sistema | Registros de más de 7 días (`journalctl --vacuum-time=7d`) |
+| ⚙️ Configuraciones residuales | Paquetes en estado `rc` (desinstalados pero con configuración) |
+
+Además:
+
+- **🗑️ Borrar aplicaciones** — desinstala apps de APT y Flatpak con *lista interactiva* (con tamaño en disco) o *búsqueda por nombre*. Al purgar, ofrece eliminar también las dependencias huérfanas.
+- **💾 Ver espacio en disco** — resumen de uso de disco y cachés comunes.
+- **🖥️ Acceso directo** — se instala en tu menú de aplicaciones con un clic.
+
+### Seguridad
+
+- ✅ Confirmación con resumen y espacio estimado **antes de cada acción destructiva**.
+- ✅ Lista de paquetes protegidos: nunca ofrece borrar el kernel en uso, paquetes esenciales (`Essential: yes`) ni componentes clave de Mint/XFCE (`mint*`, `xfce4*`, `grub*`, `systemd`...).
+- ✅ Los permisos de root se piden con el diálogo nativo de polkit (`pkexec`) — tu contraseña nunca pasa por una ventana de texto.
+- ✅ Registro en `/tmp` de cada operación para poder revisarla.
+
+### Requisitos
+
+- Linux Mint (probado en **Mint 22.3 XFCE**; debería funcionar en Cinnamon/MATE y cualquier Ubuntu/Debian con zenity)
+- `zenity` y `pkexec` — ya vienen instalados en Mint
+
+### Instalación
 
 ```bash
-cd ~/Documentos/herramienta_Linux
+git clone https://github.com/toxico80/herramienta_Linux.git
+cd herramienta_Linux
+chmod +x limpiador.sh
 ./limpiador.sh
 ```
 
-Se abre el menú gráfico principal:
+Consejo: abre la herramienta y usa la opción **🖥️ Crear acceso directo** para tenerla en tu menú de aplicaciones.
 
-| Opción | Descripción |
-|---|---|
-| 🧹 Limpiar basura | Elige con casillas qué limpiar, con tamaño estimado |
-| 🗑️ Borrar aplicaciones | Lista interactiva o búsqueda por nombre (APT + Flatpak) |
-| 💾 Ver espacio en disco | Resumen de uso de disco y cachés |
-| 🖥️ Crear acceso directo | Añade «Limpiador Mint» al menú de XFCE |
-
-### Modo terminal (sin ventanas)
+### Uso desde terminal (sin ventanas)
 
 ```bash
-./limpiador.sh --todo    # limpia TODAS las categorías (pide sudo)
+./limpiador.sh --todo    # limpia TODAS las categorías (usa sudo)
 ./limpiador.sh --help    # ayuda
 ```
 
-## Qué limpia
-
-| Categoría | Comandos equivalentes |
-|---|---|
-| Caché de APT | `sudo apt clean && sudo apt autoclean` |
-| Paquetes huérfanos | `sudo apt autoremove --purge` |
-| Kernels antiguos | `sudo apt purge linux-image-X.Y.Z...` (conserva el kernel en uso y el más nuevo) |
-| Flatpaks sin usar | `flatpak uninstall --unused` + borrado de cachés de flatpak |
-| Miniaturas | borra `~/.cache/thumbnails` |
-| Temporales | borra entradas de `/tmp` con más de 1 día |
-| Papelera | vacía `~/.local/share/Trash` |
-| Logs antiguos | `sudo journalctl --vacuum-time=7d` |
-| Configuraciones residuales | `sudo apt purge $(dpkg -l \| awk '/^rc/{print $2}')` |
-
-## Seguridad
-
-- **Confirmación antes de cada acción destructiva**, con resumen y espacio
-  estimado a liberar.
-- **Lista de paquetes protegidos**: nunca se ofrece borrar el kernel en uso,
-  paquetes esenciales (`Essential: yes`, prioridad `required`) ni componentes
-  clave de Mint/XFCE (`mint*`, `xfce4*`, `grub*`, `systemd`, `lightdm`...).
-- Al purgar apps APT, ofrece después eliminar las dependencias huérfanas.
-- Se guarda un **registro en `/tmp`** de cada operación para poder revisarla.
-- Los permisos de root se piden con el diálogo gráfico de polkit (`pkexec`);
-  nunca se escribe la contraseña en una ventana de texto.
-
-## Estructura
-
-```
-herramienta_Linux/
-├── limpiador.sh        # Script principal (menú zenity)
-├── lib/
-│   ├── utilidades.sh   # Colores, diálogos, cálculo de espacio, protecciones
-│   ├── limpieza.sh     # Tareas de limpieza + generación de script root
-│   └── apps.sh         # Inventario y desinstalación de apps (APT/Flatpak)
-└── README.md
-```
-
-## Automatización con cron (opcional)
-
-Para limpiar todo automáticamente cada domingo a las 10:00:
+### Automatizar con cron (opcional)
 
 ```bash
 sudo crontab -e
-# añadir:
-0 10 * * 0 /home/goscj1/Documentos/herramienta_Linux/limpiador.sh --todo
+# Limpieza automática cada domingo a las 10:00:
+0 10 * * 0 /ruta/a/herramienta_Linux/limpiador.sh --todo
 ```
 
-> Nota: en modo cron usa `sudo crontab` para que tenga permisos de root
-> directamente (así no necesita pedir contraseña).
+---
+
+## 🇬🇧 English
+
+### What does it do?
+
+Limpiador Mint (Mint Cleaner) automates all those maintenance commands you always have to look up online (`apt autoremove`, `journalctl --vacuum-time`, `flatpak uninstall --unused`...) and turns them into a simple GUI with checkboxes, estimated sizes and confirmations.
+
+### Features
+
+| Category | What it cleans |
+|---|---|
+| 🗃️ APT cache | Downloaded `.deb` packages (`apt clean` + `autoclean`) |
+| 📦 Orphaned packages | Dependencies no longer needed (`apt autoremove --purge`) |
+| 🐧 Old kernels | Old kernels — **always keeps the running one and the newest** |
+| 📱 Unused Flatpaks | Orphaned runtimes and Flatpak caches |
+| 🖼️ Thumbnails | Image thumbnail cache (`~/.cache/thumbnails`) |
+| ⏱️ Temporary files | Files in `/tmp` older than 1 day |
+| 🗑️ Trash | Empties the recycle bin |
+| 📜 System logs | Journals older than 7 days (`journalctl --vacuum-time=7d`) |
+| ⚙️ Residual configs | Packages in `rc` state (removed but config left behind) |
+
+Also:
+
+- **🗑️ Uninstall apps** — remove APT and Flatpak apps via an *interactive list* (with on-disk size) or *search by name*. After purging, it offers to remove leftover orphaned dependencies.
+- **💾 Disk usage** — overview of disk space and common caches.
+- **🖥️ Desktop shortcut** — installs itself into your application menu with one click.
+
+### Safety
+
+- ✅ Confirmation dialog with a summary and estimated freed space **before every destructive action**.
+- ✅ Protected package list: it never offers to remove the running kernel, essential packages, or key Mint/XFCE components.
+- ✅ Root privileges are requested through the native polkit dialog (`pkexec`) — your password never goes through a text window.
+- ✅ Every operation is logged to `/tmp` so you can review it.
+
+### Requirements
+
+- Linux Mint (tested on **Mint 22.3 XFCE**; should work on Cinnamon/MATE and any Ubuntu/Debian with zenity)
+- `zenity` and `pkexec` — already installed on Mint
+
+### Installation
+
+```bash
+git clone https://github.com/toxico80/herramienta_Linux.git
+cd herramienta_Linux
+chmod +x limpiador.sh
+./limpiador.sh
+```
+
+Tip: open the tool and use **🖥️ Create shortcut** to add it to your application menu.
+
+### Terminal mode (headless)
+
+```bash
+./limpiador.sh --todo    # clean ALL categories (uses sudo)
+./limpiador.sh --help    # help
+```
+
+---
+
+<div align="center">
+
+### 📁 Estructura del proyecto / Project structure
+
+```
+herramienta_Linux/
+├── limpiador.sh        # Menú principal / Main menu (zenity)
+├── lib/
+│   ├── utilidades.sh   # Diálogos, espacio, protecciones / Dialogs & safety
+│   ├── limpieza.sh     # 9 tareas de limpieza / 9 cleaning tasks
+│   └── apps.sh         # Inventario y desinstalación / App inventory & removal
+└── README.md
+```
+
+Hecho con ❤️ y Bash por [toxico80](https://github.com/toxico80) · Licencia MIT
+
+*¿Te ayudó? ¡Dale una ⭐ al repo!* — *Found it useful? Give the repo a ⭐!*
+
+</div>
