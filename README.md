@@ -63,8 +63,8 @@ Además:
 ### Instalación
 
 ```bash
-git clone https://github.com/toxico80/herramienta_Linux.git
-cd herramienta_Linux
+git clone https://github.com/toxico80/Limpalor.git
+cd Limpalor
 chmod +x limpiador.sh
 ./limpiador.sh
 ```
@@ -129,8 +129,8 @@ Also:
 ### Installation
 
 ```bash
-git clone https://github.com/toxico80/herramienta_Linux.git
-cd herramienta_Linux
+git clone https://github.com/toxico80/Limpalor.git
+cd Limpalor
 chmod +x limpiador.sh
 ./limpiador.sh
 ```
