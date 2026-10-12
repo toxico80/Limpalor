@@ -47,11 +47,44 @@ crear_atajo() {
   if ! confirmar "¿Crear un acceso directo «Limpiador Mint» en tu menú de aplicaciones?"; then
     return 0
   fi
-  mkdir -p "$HOME/.local/share/applications" "$HOME/.local/share/icons"
-  # Instalamos el icono propio en la carpeta de iconos del usuario
+  mkdir -p "$HOME/.local/share/applications"
+  # Instalamos el icono propio en la estructura de tema hicolor
+  # (los iconos sueltos en ~/.local/share/icons/ no los encuentra el sistema)
   local icono="preferences-system"
   if [[ -f "$DIR_BASE/docs/icono.png" ]]; then
-    cp "$DIR_BASE/docs/icono.png" "$HOME/.local/share/icons/limpiador-mint.png"
+    local tam
+    for tam in 48 128 512; do
+      local src="$DIR_BASE/docs/icono-${tam}.png"
+      [[ -f "$src" ]] || src="$DIR_BASE/docs/icono.png"
+      mkdir -p "$HOME/.local/share/icons/hicolor/${tam}x${tam}/apps"
+      cp "$src" "$HOME/.local/share/icons/hicolor/${tam}x${tam}/apps/limpiador-mint.png"
+    done
+    # El tema hicolor del usuario necesita un index.theme para que la caché funcione
+    if [[ ! -f "$HOME/.local/share/icons/hicolor/index.theme" ]]; then
+      cat > "$HOME/.local/share/icons/hicolor/index.theme" <<'IDX'
+[Icon Theme]
+Name=Hicolor
+Comment=Fallback icon theme
+Hidden=true
+Directories=48x48/apps,128x128/apps,512x512/apps
+
+[48x48/apps]
+Size=48
+Context=Applications
+Type=Threshold
+
+[128x128/apps]
+Size=128
+Context=Applications
+Type=Threshold
+
+[512x512/apps]
+Size=512
+Context=Applications
+Type=Threshold
+IDX
+    fi
+    gtk-update-icon-cache -f "$HOME/.local/share/icons/hicolor" >/dev/null 2>&1 || true
     icono="limpiador-mint"
   fi
   cat > "$destino" <<EOF
